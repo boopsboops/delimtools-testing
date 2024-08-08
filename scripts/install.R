@@ -21,6 +21,8 @@ usethis::gh_token_help()
 renv::install("legalLab/delimtools")
 # can specify a specific commit 
 renv::install("legalLab/delimtools@c94e41a")
+# or locally for unpushed changes
+renv::install(here("../delimtools"))
 
 # record packages
 renv::status()
