@@ -15,10 +15,12 @@ Rscript -e "renv::restore()"
 # dry
 scripts/download-sequences.R -c Chiloglanis -n 500 -x 2500 -b 1 -a false -d true
 scripts/download-sequences.R -c Atopochilus -n 500 -x 2500 -b 1 -a false -d true
+scripts/download-sequences.R -c Euchilichthys -n 500 -x 2500 -b 1 -a false -d true
 
 # real
 scripts/download-sequences.R -c Chiloglanis -n 500 -x 2500 -b 500 -a false -d false
 scripts/download-sequences.R -c Atopochilus -n 500 -x 2500 -b 10 -a true -d false
+scripts/download-sequences.R -c Euchilichthys -n 500 -x 2500 -b 10 -a true -d false
 
 # cluster
 scripts/clean-and-cluster.R -n 10 -c 0.6 -m 2
