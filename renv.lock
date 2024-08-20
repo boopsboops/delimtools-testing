@@ -166,11 +166,11 @@
       "Version": "1.0.2",
       "Source": "Local",
       "RemoteType": "local",
-      "RemoteUrl": "../bGMYC_1.0.2.tar.gz",
+      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/bGMYC_1.0.2.tar.gz",
       "Requirements": [
         "ape"
       ],
-      "Hash": "768c1dd122e66eb9a0ed6f1372fa5ba8"
+      "Hash": "9a5a029c3d0b21ae6c8f57ce4a058b71"
     },
     "bit": {
       "Package": "bit",
@@ -1039,18 +1039,18 @@
     },
     "splits": {
       "Package": "splits",
-      "Version": "1.0-19",
+      "Version": "1.0-20",
       "Source": "Local",
       "Repository": "R-Forge",
       "RemoteType": "local",
-      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/delimtools/delimtools-testing/../splits_1.0-19.tar.gz",
+      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/splits_1.0-20.tar.gz",
       "Requirements": [
         "MASS",
         "R",
         "ape",
         "paran"
       ],
-      "Hash": "e258d40781f94460cac919814c61712a"
+      "Hash": "81b4dfa32ce294f9fe840221b11ad2f6"
     },
     "stringi": {
       "Package": "stringi",
