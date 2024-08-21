@@ -105,7 +105,7 @@ Rscript -e "renv::restore()"
 # wget https://nreid.github.io/assets/bGMYC_1.0.2.tar.gz
 # wget http://download.r-forge.r-project.org/src/contrib/splits_1.0-20.tar.gz
 Rscript -e "renv::install(here::here(getwd(),'software/splits_1.0-20.tar.gz'))"
-Rscript -e "renv::install(here::here(getwd(),'software/bGMYC_1.0.2.tar.gz'))"
+Rscript -e "renv::install(here::here(getwd(),'software/bGMYC_1.0.3.tar.gz'))"
 ```
 
 
@@ -116,15 +116,20 @@ Rscript -e "renv::install(here::here(getwd(),'software/bGMYC_1.0.2.tar.gz'))"
 # install renv for testing
 #renv::install(here::here("../delimtools"))
 #renv::install("legalLab/delimtools")
+#renv::install(here::here(getwd(),'software/bGMYC_1.0.3.tar.gz'))
 library("here")
 library("glue")
 library("tidyverse")
 library("ape")
 library("spider")
+library("splits")
+library("bGMYC")
 library("delimtools")
 
 # read tree
-cytb.chiloglanis.tr <- treeio::read.newick(here("assets/cytb.chiloglanis.nwk"))
+cytb.chiloglanis.raxml.tr <- ape::read.tree(here("assets/cytb.chiloglanis.nwk"))
+cytb.chiloglanis.beast.tr <- ape::read.nexus(here("temp/beast/cytb.chiloglanis.beast.tre"))
+
 # read data 
 cytb.chiloglanis.df <- read_csv(here("assets/cytb.chiloglanis.csv"),show_col_types=FALSE)
 #cytb.chiloglanis.df |> glimpse()
@@ -141,14 +146,18 @@ outgroups <- cytb.chiloglanis.df |>
     filter(genus!="Chiloglanis") |> 
     pull(gbAccession)
 # get root
-root.node <- ape::getMRCA(cytb.chiloglanis.tr,tip=outgroups)
+root.node <- ape::getMRCA(cytb.chiloglanis.raxml.tr,tip=outgroups)
 
 # join drop
 drops <- unique(c(setdiff(names(cytb.chiloglanis.fa),haps.collapsed),outgroups))
 
 # root and drop outgroups and duplicated haps
-cytb.chiloglanis.tr.root <- cytb.chiloglanis.tr |> 
+cytb.chiloglanis.raxml.tr.root <- cytb.chiloglanis.raxml.tr |> 
     ape::root(node=root.node,resolve.root=TRUE) |> 
+    ape::drop.tip(drops)
+
+# root and drop outgroups and duplicated haps
+cytb.chiloglanis.beast.tr.root <- cytb.chiloglanis.beast.tr |> 
     ape::drop.tip(drops)
 
 # drop from fasta and write
@@ -161,17 +170,15 @@ cytb.chiloglanis.fa.haps |> ape::write.FASTA(here("assets/cytb.chiloglanis.haps.
 today.dir <- glue('Results_{Sys.Date()}')
 today.path <- here("temp",today.dir)
 if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
-tr.path <- here(today.path,"cytb.chiloglanis.rooted.nwk")
+raxml.tr.path <- here(today.path,"cytb.chiloglanis.rooted.nwk")
+beast.tr.path <- here(today.path,"cytb.chiloglanis.rooted.tre")
+
 
 # save
-cytb.chiloglanis.tr.root |> ape::write.tree(file=tr.path)
+cytb.chiloglanis.raxml.tr.root |> ape::write.tree(file=raxml.tr.path)
+cytb.chiloglanis.beast.tr.root |> ape::write.nexus(file=beast.tr.path)
 
-# run MPTP
-# minbr
-#minbrlen <- format(min(cytb.chiloglanis.tr.root$edge.length),scientific=FALSE)
-#delimtools::minbr(tree=tr.path, file=here("assets/cytb.chiloglanis.fasta"))
-cytb.chiloglanis.ptp <- delimtools::mptp(infile=tr.path,outfolder=today.path,method="single")
-# fix locations of output files
+
 ```
 
 ```bash
@@ -191,17 +198,35 @@ treeannotator -burninTrees 0 -heights ca cytb.chiloglanis.run.1-2.trees cytb.chi
 ```
 
 
-```
+
+```r
+today.dir <- glue('Results_{Sys.Date()}')
+today.path <- here("temp",today.dir)
+if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
+
+
+# load data
+cytb.chiloglanis.df <- read_csv(here("assets/cytb.chiloglanis.csv"),show_col_types=FALSE)
+cytb.chiloglanis.fa.haps <- ape::read.FASTA(here("assets/cytb.chiloglanis.haps.fasta"))
+cytb.chiloglanis.beast.tr <- ape::read.nexus("assets/cytb.chiloglanis.rooted.tre")
+cytb.chiloglanis.raxml.tr <- ape::read.tree("assets/cytb.chiloglanis.rooted.nwk")
+
 ## run GMYC
 # run gmyc simple
+ape::is.binary(cytb.chiloglanis.beast.tr)
 set.seed(42)
-gmyc.res <- splits::gmyc(tr, method = "single", interval = c(0, 5), quiet = FALSE)
-summary(gmyc_res)
-
+gmyc.res <- splits::gmyc(cytb.chiloglanis.beast.tr,method="single",interval=c(0,5),quiet=FALSE)
+summary(gmyc.res)
 # make df
-gmyc_df <- gmyc_tbl(gmyc_res)
+gmyc.df <- gmyc_tbl(gmyc.res)
+print(gmyc.df)
 
-
+# run bgmyc
+set.seed(42)
+bgmyc.res.single <- bGMYC::bgmyc.singlephy(cytb.chiloglanis.beast.tr,mcmc=11000,burnin=1000,thinning=100,t1=2,t2=length(cytb.chiloglanis.beast.tr$tip.label),start=c(1,0.5,50))
+# make df
+bgmyc.df <- delimtools::bgmyc_tbl(bgmyc.res.single,ppcutoff=0.05)
+print(bgmyc.df)
 ```
 
 ```r
@@ -209,11 +234,40 @@ gmyc_df <- gmyc_tbl(gmyc_res)
 mat <- ape::dist.dna(cytb.chiloglanis.fa.haps,model="raw",pairwise.deletion=TRUE)
 lmin <- spider::localMinima(as.matrix(mat))
 locmin.df <- delimtools::locmin_tbl(mat,threshold=lmin$localMinima[1])
+print(locmin.df)
 ```
 
 ```r
 #run asap
-if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
-asap.df <- delimtools::asap(infile=here(today.path,"cytb.chiloglanis.haps.fasta"),model=3,outfolder=today.path)
+asap.df <- delimtools::asap(infile=here("assets/cytb.chiloglanis.haps.fasta"),model=3,outfolder=today.path)
+print(asap.df)
 # change groupe_1 to Partition_1
+
+# run MPTP
+# minbr
+#minbrlen <- format(min(cytb.chiloglanis.raxml.tr.root$edge.length),scientific=FALSE)
+#delimtools::minbr(tree=raxml.tr.path, file=here("assets/cytb.chiloglanis.fasta"))
+mptp.df <- delimtools::mptp(infile=here("assets/cytb.chiloglanis.rooted.nwk"),outfolder=today.path,method="single")
+print(mptp.df)
+# fix locations of output files
+
+# join
+all.delims.df <- delim_join(list(gmyc.df,bgmyc.df,locmin.df,asap.df,mptp.df))
+
+# autoplot
+cytb.chiloglanis.beast.tr.plot <- treeio::read.beast("assets/cytb.chiloglanis.rooted.tre")
+
+ftab <- cytb.chiloglanis.df |> 
+    filter(gbAccession %in% pull(all.delims.df,labels)) |> 
+    mutate(labs=glue("{gbAccession} | {scientificName}")) |> 
+    dplyr::select(gbAccession,labs)
+
+cols2 <- delim_brewer(all.delims.df,"Set1",9)
+
+
+source(here("../delimtools/R/delim_autoplot2.R"))
+library("ggtree")
+cytb.chiloglanis.beast.tr.plot@data
+p <- delim_autoplot2(delim=all.delims.df,tr=cytb.chiloglanis.beast.tr.plot,tbl_labs=ftab,col_vec=cols2) 
+
 ```
