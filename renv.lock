@@ -163,14 +163,14 @@
     },
     "bGMYC": {
       "Package": "bGMYC",
-      "Version": "1.0.2",
+      "Version": "1.0.3",
       "Source": "Local",
       "RemoteType": "local",
-      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/bGMYC_1.0.2.tar.gz",
+      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/bGMYC_1.0.3.tar.gz",
       "Requirements": [
         "ape"
       ],
-      "Hash": "9a5a029c3d0b21ae6c8f57ce4a058b71"
+      "Hash": "f9585006634ff8ea22576c79afa6b5c5"
     },
     "bit": {
       "Package": "bit",
@@ -291,13 +291,9 @@
     "delimtools": {
       "Package": "delimtools",
       "Version": "1.0.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "legalLab",
-      "RemoteRepo": "delimtools",
-      "RemoteRef": "main",
-      "RemoteSha": "c94e41a838abd9d4c58a7d217fdc9b6900d64401",
+      "Source": "Local",
+      "RemoteType": "local",
+      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/../delimtools",
       "Requirements": [
         "RColorBrewer",
         "ape",
@@ -321,7 +317,7 @@
         "tidyselect",
         "vctrs"
       ],
-      "Hash": "865bdd22d3b53a7592f15bf5ce925e2b"
+      "Hash": "ef847d8da8d9c096f3aed9e8d3e8fa1b"
     },
     "desc": {
       "Package": "desc",
