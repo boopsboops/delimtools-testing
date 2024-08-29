@@ -170,7 +170,7 @@
       "Requirements": [
         "ape"
       ],
-      "Hash": "f9585006634ff8ea22576c79afa6b5c5"
+      "Hash": "3f17b0da7a27da266f4814d3e917ead7"
     },
     "bit": {
       "Package": "bit",
@@ -293,7 +293,7 @@
       "Version": "1.0.0",
       "Source": "Local",
       "RemoteType": "local",
-      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/../delimtools",
+      "RemoteUrl": "software/delimtools.zip",
       "Requirements": [
         "RColorBrewer",
         "ape",
@@ -317,7 +317,7 @@
         "tidyselect",
         "vctrs"
       ],
-      "Hash": "ef847d8da8d9c096f3aed9e8d3e8fa1b"
+      "Hash": "8254ced73b209605ac0a9ec9d1c862f8"
     },
     "desc": {
       "Package": "desc",
@@ -1046,7 +1046,7 @@
         "ape",
         "paran"
       ],
-      "Hash": "81b4dfa32ce294f9fe840221b11ad2f6"
+      "Hash": "c739766b7b0def8e9fb1b94060f7054f"
     },
     "stringi": {
       "Package": "stringi",
