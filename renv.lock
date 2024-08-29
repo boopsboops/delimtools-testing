@@ -1037,7 +1037,6 @@
       "Package": "splits",
       "Version": "1.0-20",
       "Source": "Local",
-      "Repository": "R-Forge",
       "RemoteType": "local",
       "RemoteUrl": "software/splits_1.0-20.tar.gz",
       "Requirements": [
