@@ -166,7 +166,7 @@
       "Version": "1.0.3",
       "Source": "Local",
       "RemoteType": "local",
-      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/bGMYC_1.0.3.tar.gz",
+      "RemoteUrl": "software/bGMYC_1.0.3.tar.gz",
       "Requirements": [
         "ape"
       ],
@@ -1039,7 +1039,7 @@
       "Source": "Local",
       "Repository": "R-Forge",
       "RemoteType": "local",
-      "RemoteUrl": "/media/1TB/auto_backed_up/Projects/legalLab/packages/delimtools-testing/software/splits_1.0-20.tar.gz",
+      "RemoteUrl": "software/splits_1.0-20.tar.gz",
       "Requirements": [
         "MASS",
         "R",
