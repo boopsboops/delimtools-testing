@@ -28,48 +28,41 @@ scripts/tidy-results-directory.R
 #renv::install(here::here("../delimtools"))
 #renv::install("legalLab/delimtools")
 #renv::install(here::here(getwd(),'software/bGMYC_1.0.3.tar.gz'))
-library("here")
-library("glue")
-library("tidyverse")
-library("ape")
-library("spider")
-library("splits")
-library("bGMYC")
-library("delimtools")
+source(here::here("scripts/load-libs.R"))
 
 # create a temporary directory
-today.dir <- glue('Results_{Sys.Date()}')
-today.path <- here("temp",today.dir)
+today.dir <- glue::glue('Results_{Sys.Date()}')
+today.path <- here::here("temp",today.dir)
 if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
 
 # copy files from ncbi-supermatrix
-file.copy(here("ncbi-supermatrix/temp/Results_2024-08-27/alignments/coi.aligned.trimmed.fasta"), here(today.path,"coi.geophagus.fasta"))
-file.copy(here("ncbi-supermatrix/temp/Results_2024-08-27/trees/coi.aligned.trimmed.fasta.raxml.bestTree"), here(today.path,"coi.geophagus.nwk"))
-file.copy(here("ncbi-supermatrix/temp/Results_2024-08-27/metadata/ncbi-clean.csv"), here(today.path,"coi.geophagus.csv"))
+file.copy(here::here("ncbi-supermatrix/temp/Results_2024-08-27/alignments/coi.aligned.trimmed.fasta"), here::here(today.path,"coi.geophagus.fasta"))
+file.copy(here::here("ncbi-supermatrix/temp/Results_2024-08-27/trees/coi.aligned.trimmed.fasta.raxml.bestTree"), here::here(today.path,"coi.geophagus.nwk"))
+file.copy(here::here("ncbi-supermatrix/temp/Results_2024-08-27/metadata/ncbi-clean.csv"), here::here(today.path,"coi.geophagus.csv"))
 
 # read fasta
-coi.geophagus.fa <- ape::read.FASTA(here(today.path,"coi.geophagus.fasta"))
+coi.geophagus.fa <- ape::read.FASTA(here::here(today.path,"coi.geophagus.fasta"))
 # read tree
-coi.geophagus.raxml.tr <- ape::read.tree(here(today.path,"coi.geophagus.nwk"))
+coi.geophagus.raxml.tr <- ape::read.tree(here::here(today.path,"coi.geophagus.nwk"))
 # read data 
-coi.geophagus.df <- read_csv(here(today.path,"coi.geophagus.csv"),show_col_types=FALSE)
+coi.geophagus.df <- readr::read_csv(here::here(today.path,"coi.geophagus.csv"),show_col_types=FALSE)
 
 # get ingroup and outgroups
 ingroup.tips <- coi.geophagus.df |> 
-    filter(grepl("harreri|winemilleri",scientificName)) |> 
-    slice_head(n=1,by=scientificName) |> 
-    pull(gbAccession)
+    dplyr::filter(grepl("harreri|winemilleri",scientificName)) |> 
+    dplyr::slice_head(n=1,by=scientificName) |> 
+    dplyr::pull(gbAccession)
 
 # get one outgroup (any G. brasiliensis)
 outgroup <- coi.geophagus.df |> 
-    filter(grepl("brasiliensis",scientificName)) |> 
-    slice_head(n=1) |> 
-    pull(gbAccession)
+    dplyr::filter(grepl("brasiliensis",scientificName)) |> 
+    dplyr::slice_head(n=1) |> 
+    dplyr::pull(gbAccession)
 
 # get all ingroup tips
 coi.geophagus.raxml.tr.rooted <- coi.geophagus.raxml.tr |> ape::root(outgroup=outgroup,resolve.root=TRUE)
 ingroup.node <- coi.geophagus.raxml.tr.rooted |> ape::getMRCA(ingroup.tips)
-ingroup <- extract.clade(coi.geophagus.raxml.tr.rooted,node=ingroup.node)$tip.label
+ingroup <- ape::extract.clade(coi.geophagus.raxml.tr.rooted,node=ingroup.node)$tip.label
 
 # join ingroup and outgroup
 geo.gb <- c(ingroup,outgroup)
@@ -88,7 +81,7 @@ coi.geophagus.haps.fa |> ape::write.FASTA(here(today.path,"coi.geophagus.haps.fa
 # write out df
 coi.geophagus.df |> 
     filter(gbAccession %in% haps.collapsed) |> 
-    write_csv(here(today.path,"coi.geophagus.haps.csv"))
+    readr::write_csv(here::here(today.path,"coi.geophagus.haps.csv"))
 ```
 
 
@@ -127,21 +120,21 @@ raxml-ng --evaluate --threads auto{} --tree coi.geophagus.haps.beast.tre.nwk --l
 
 ```r
 # get temp dir
-today.dir <- glue('Results_{Sys.Date()}')
-today.path <- here("temp",today.dir)
+today.dir <- glue::glue('Results_{Sys.Date()}')
+today.path <- here::here("temp",today.dir)
 if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
 
 # read tree and drop outgroup
-coi.geophagus.haps.raxml.tr <- ape::read.tree(here(today.path,"coi.geophagus.haps.fasta.raxml.bestTree")) |> ape::drop.tip("MH538063.1")
+coi.geophagus.haps.raxml.tr <- ape::read.tree(here::here(today.path,"coi.geophagus.haps.fasta.raxml.bestTree")) |> ape::drop.tip("MH538063.1")
 
 # read beast tree and drop outgroup
-coi.geophagus.haps.beast.tr <- treeio::read.beast(here(today.path,"coi.geophagus.haps.beast.tre")) |> treeio::drop.tip("MH538063.1")
+coi.geophagus.haps.beast.tr <- treeio::read.beast(here::here(today.path,"coi.geophagus.haps.beast.tre")) |> treeio::drop.tip("MH538063.1")
 
 # read data 
-coi.geophagus.haps.df <- read_csv(here(today.path,"coi.geophagus.haps.csv"),show_col_types=FALSE) |> filter(gbAccession!="MH538063.1")
+coi.geophagus.haps.df <- readr::read_csv(here::here(today.path,"coi.geophagus.haps.csv"),show_col_types=FALSE) |> filter(gbAccession!="MH538063.1")
 
 # read dna 
-coi.geophagus.haps.fa <- ape::read.FASTA(here(today.path,"coi.geophagus.haps.fasta"))
+coi.geophagus.haps.fa <- ape::read.FASTA(here::here(today.path,"coi.geophagus.haps.fasta"))
 coi.geophagus.haps.fa <- coi.geophagus.haps.fa[which(names(coi.geophagus.haps.fa)!="MH538063.1")]
 
 # write out
