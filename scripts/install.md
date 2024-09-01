@@ -11,6 +11,7 @@ cd delimtools-testing
 mkdir temp software
 cp assets/splits_1.0-20.tar.gz software/splits_1.0-20.tar.gz
 cp assets/bGMYC_1.0.3.tar.gz software/bGMYC_1.0.3.tar.gz
+cp assets/delimtools.zip software/delimtools.zip
 ```
 
 ### Install R packages to run delimtools-testing
@@ -21,8 +22,8 @@ Rscript -e "renv::restore()"
 # need to sort out bGMYC and GMYC package installs
 # wget https://nreid.github.io/assets/bGMYC_1.0.2.tar.gz
 # wget http://download.r-forge.r-project.org/src/contrib/splits_1.0-20.tar.gz
-Rscript -e "renv::install(here::here(getwd(),'software/splits_1.0-20.tar.gz'))"
-Rscript -e "renv::install(here::here(getwd(),'software/bGMYC_1.0.3.tar.gz'))"
+#Rscript -e "renv::install(here::here(getwd(),'software/splits_1.0-20.tar.gz'))"
+#Rscript -e "renv::install(here::here(getwd(),'software/bGMYC_1.0.3.tar.gz'))"
 ```
 
 
@@ -37,8 +38,6 @@ git checkout v0.2.5
 ./autogen.sh
 ./configure
 make
-echo "export PATH=$(pwd)/bin:\$PATH" >> ~/.bashrc
-exec "$SHELL"
 cd ..
 ```
 
@@ -53,9 +52,7 @@ cd ASAP
 make
 mkdir bin
 mv asap bin/asap
-echo "export PATH=$(pwd)/bin:\$PATH" >> ~/.bashrc
-exec "$SHELL"
-cd ../..
+cd ..
 ```
 
 
