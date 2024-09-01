@@ -1,11 +1,11 @@
-# Using delimtools to delimit Neotropical cichlids of the genus Geophagus
+# Using delimtools to delimit Neotropical cichlids of the genus _Geophagus_
 
-Please install required software following instructions in [install.md](assets/install.md).
+Please install required software following instructions in [install.md](scripts/install.md).
 
-For code to acquire the Geophagus dataset please follow instructions in [acquire-sequence-data.md](assets/acquire-sequence-data.md).
+For code to acquire the _Geophagus_ dataset please follow instructions in [acquire-sequence-data.md](scripts/acquire-sequence-data.md).
 
 
-### R code to run Geophagus delimitation analysis using delimtools
+### R code to run _Geophagus_ delimitation analysis using delimtools
 
 ```r
 ##################
@@ -14,17 +14,8 @@ For code to acquire the Geophagus dataset please follow instructions in [acquire
 
 #renv::install(here::here("../delimtools"))
 #renv::install("legalLab/delimtools")
-library("here")
-library("glue")
-library("tidyverse")
-library("ape")
-library("spider")
-library("splits")
-library("bGMYC")
-library("treeio")
-library("ggtree")
-library("randomcoloR")
-library("delimtools")
+# load R packages
+source(here::here("scripts/load-libs.R"))
 
 
 ##################
@@ -32,39 +23,33 @@ library("delimtools")
 ##################
 
 # set temporary working directory in 'temp/'
-rm(list=ls())
-today.dir <- glue('Results_{Sys.Date()}')
-today.path <- here("temp",today.dir)
+today.dir <- glue::glue('Results_{Sys.Date()}')
+today.path <- here::here("temp",today.dir)
 if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
 
-# fun to report n delims
-report_delim <- function(df) {
-    rep <- df |> pull(2) |> unique() |> length()
-    df.name <- deparse(substitute(df))
-    writeLines(glue::glue("The '{df.name}' delimitation table contains a total of {rep} unique species."))
-}
 
 
 ##################
 ### load data ####
 ##################
 
-coi.geophagus.haps.raxml.tr <- ape::read.tree(here("assets/coi.geophagus.haps.raxml.nwk"))
-coi.geophagus.haps.beast.tr <- treeio::read.beast(here("assets/coi.geophagus.haps.beast.tre"))
-coi.geophagus.haps.df <- readr::read_csv(here("assets/coi.geophagus.haps.csv"),show_col_types=FALSE)
-coi.geophagus.haps.fa <- ape::read.FASTA(here("assets/coi.geophagus.haps.fasta"))
+coi.geophagus.haps.raxml.tr <- ape::read.tree(here::here("assets/coi.geophagus.haps.raxml.nwk"))
+coi.geophagus.haps.beast.tr <- treeio::read.beast(here::here("assets/coi.geophagus.haps.beast.tre"))
+coi.geophagus.haps.df <- readr::read_csv(here::here("assets/coi.geophagus.haps.csv"),show_col_types=FALSE)
+coi.geophagus.haps.fa <- ape::read.FASTA(here::here("assets/coi.geophagus.haps.fasta"))
 
 
 ##################
 #### run gmyc ####
 ##################
 
+# check it tree is binary (should be TRUE)
 ape::is.binary(treeio::as.phylo(coi.geophagus.haps.beast.tr))
 set.seed(42)
 gmyc.res <- splits::gmyc(treeio::as.phylo(coi.geophagus.haps.beast.tr),method="single",interval=c(0,5),quiet=FALSE)
 summary(gmyc.res)
 # make df
-gmyc.df <- gmyc_tbl(gmyc.res)
+gmyc.df <- delimtools::gmyc_tbl(gmyc.res)
 #gmyc.df |> print(n=Inf)
 gmyc.df |> report_delim()
 
@@ -87,7 +72,7 @@ bgmyc.df |> report_delim()
 
 mat <- ape::dist.dna(coi.geophagus.haps.fa,model="raw",pairwise.deletion=TRUE)
 lmin <- spider::localMinima(as.matrix(mat))
-plot(lmin)
+plot(lmin); abline(v=lmin$localMinima[1],col="red")
 locmin.df <- delimtools::locmin_tbl(mat,threshold=lmin$localMinima[1])
 #locmin.df |> print(n=Inf)
 locmin.df |> report_delim()
@@ -106,27 +91,42 @@ locmin.df.pc |> report_delim()
 #### run asap ####
 ##################
 
-asap.df <- delimtools::asap(infile=here("assets/coi.geophagus.haps.fasta"),model=3,outfolder=today.path)
+source(here("../delimtools/R/asap.R"))
+asap.df <- asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
+#asap.df <- delimtools::asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
 #asap.df |> print(n=Inf)
 asap.df |> report_delim()
 
 
 ##################
-#### run mptp ####
+### run mptp s ###
 ##################
 
 #minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
 #delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-mptp.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),outfolder=today.path,method="single")
+#source(here("../delimtools/R/mptp.R"))
+#mptp.s.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
+mptp.s.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
 #mptp.df |> print(n=Inf)
-mptp.df |> report_delim()
+mptp.s.df |> report_delim()
+
+
+##################
+### run mptp m ###
+##################
+
+#minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
+#delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
+mptp.m.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),outfolder=today.path,method="multi")
+#mptp.df |> print(n=Inf)
+mptp.m.df |> report_delim()
 
 
 ##################
 ### join delims ##
 ##################
 
-all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.df))
+all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.s.df,mptp.m.df))
 #all.delims.df |> print(n=Inf)
 
 
@@ -154,16 +154,16 @@ coi.geophagus.haps.beast.tr.sub <- coi.geophagus.haps.beast.tr |> tidytree::keep
 ##################
 
 # make tip label table
-ftab <- coi.geophagus.haps.df.sub |> 
-    mutate(labs=glue("{gbAccession} | {scientificName}")) |> 
+tip.tab <- coi.geophagus.haps.df.sub |> 
+    dplyr::mutate(labs=glue::glue("{gbAccession} | {scientificName}")) |> 
     dplyr::select(gbAccession,labs)
 
 # get number spp
 #cols2 <- delim_brewer(all.delims.df,"Set1",n=9,seed=7)
 n.spp <- all.delims.df.sub |> 
-    pivot_longer(cols=!labels,names_to="method",values_to="spp") |> 
-    distinct(spp) |> 
-    pull(spp) |> 
+    tidyr::pivot_longer(cols=!labels,names_to="method",values_to="spp") |> 
+    dplyr::distinct(spp) |> 
+    dplyr::pull(spp) |> 
     length()
 
 # randomise colours
@@ -171,6 +171,6 @@ set.seed(42)
 cols2 <- randomcoloR::distinctColorPalette(k=n.spp)
 
 # plot and save
-p <- delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=ftab,col_vec=cols2,hexpand=0.4,widths=c(0.5,0.2),n_match=3)
-ggsave(here(today.path,"geophagus-delimitation.pdf"),plot=p,height=400,width=300,units="mm")
+p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=ftab,col_vec=cols2,hexpand=0.4,widths=c(0.5,0.2),n_match=3,delim_order=c("asap","locmin","percent","gmyc","bgmyc","ptp","mptp"))
+ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=400,width=300,units="mm")
 ```
