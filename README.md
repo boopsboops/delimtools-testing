@@ -1,9 +1,10 @@
-# Using delimtools to delimit Neotropical cichlids of the genus _Geophagus_
+# Using delimtools to delimit Neotropical eartheater cichlids of the genus _Geophagus_
 
 Please install required software following instructions in [install.md](scripts/install.md).
 
 For code to acquire the _Geophagus_ dataset please follow instructions in [acquire-sequence-data.md](scripts/acquire-sequence-data.md).
 
+![_Geophagus_ sp. "red head Tapajós"](assets/geophagus_redhead_tapajos.jpg)
 
 ### R code to run _Geophagus_ delimitation analysis using delimtools
 
@@ -26,7 +27,6 @@ source(here::here("scripts/load-libs.R"))
 today.dir <- glue::glue('Results_{Sys.Date()}')
 today.path <- here::here("temp",today.dir)
 if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
-
 
 
 ##################
