@@ -13,6 +13,7 @@ For code to acquire the _Geophagus_ dataset please follow instructions in [acqui
 #### packages ####
 ##################
 
+#renv::install(here::here("assets/delimtools.zip"))
 #renv::install(here::here("../delimtools"))
 #renv::install("legalLab/delimtools")
 # load R packages
