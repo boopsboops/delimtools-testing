@@ -40,10 +40,22 @@ coi.geophagus.haps.fa <- ape::read.FASTA(here::here("assets/coi.geophagus.haps.f
 
 
 ##################
+#### run morph ###
+##################
+
+# get delimitations from taxon labels in table
+# source(here("../delimtools/R/morph_tbl.R"))
+morph.df <- delimtools::morph_tbl(labels=dplyr::pull(coi.geophagus.haps.df,gbAccession),sppVector=dplyr::pull(coi.geophagus.haps.df,scientificName))
+morph.df
+#morph.df |> print(n=Inf)
+morph.df |> report_delim()
+
+
+##################
 #### run gmyc ####
 ##################
 
-# check it tree is binary (should be TRUE)
+# check if tree is binary (should be TRUE)
 ape::is.binary(treeio::as.phylo(coi.geophagus.haps.beast.tr))
 set.seed(42)
 gmyc.res <- splits::gmyc(treeio::as.phylo(coi.geophagus.haps.beast.tr),method="single",interval=c(0,5),quiet=FALSE)
@@ -91,11 +103,21 @@ locmin.df.pc |> report_delim()
 #### run asap ####
 ##################
 
-source(here("../delimtools/R/asap.R"))
-asap.df <- asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
-#asap.df <- delimtools::asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
+#source(here("../delimtools/R/asap.R"))
+#asap.df <- asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
+asap.df <- delimtools::asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
 #asap.df |> print(n=Inf)
 asap.df |> report_delim()
+
+
+##################
+#### run abgd ####
+##################
+
+#source(here("../delimtools/R/abgd.R"))
+abgd.df <- delimtools::abgd(infile=here::here("assets/coi.geophagus.haps.fasta"),slope=0.5,exe=here::here("software/Abgd/bin/abgd"),model=3)
+#asap.df |> print(n=Inf)
+abgd.df |> report_delim()
 
 
 ##################
@@ -117,7 +139,7 @@ mptp.s.df |> report_delim()
 
 #minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
 #delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-mptp.m.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),outfolder=today.path,method="multi")
+mptp.m.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi")
 #mptp.df |> print(n=Inf)
 mptp.m.df |> report_delim()
 
@@ -126,7 +148,7 @@ mptp.m.df |> report_delim()
 ### join delims ##
 ##################
 
-all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.s.df,mptp.m.df))
+all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.s.df,mptp.m.df,abgd.df,morph.df))
 #all.delims.df |> print(n=Inf)
 
 
@@ -171,6 +193,7 @@ set.seed(42)
 cols2 <- randomcoloR::distinctColorPalette(k=n.spp)
 
 # plot and save
-p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=ftab,col_vec=cols2,hexpand=0.4,widths=c(0.5,0.2),n_match=3,delim_order=c("asap","locmin","percent","gmyc","bgmyc","ptp","mptp"))
+source(here("../delimtools/R/delim_autoplot.R"))
+p <- delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols2,hexpand=0.4,widths=c(0.5,0.2),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"))
 ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=400,width=300,units="mm")
 ```

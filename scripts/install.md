@@ -56,6 +56,20 @@ cd ..
 ```
 
 
+### Install ABGD
+##### !!! REQUIRED FOR FULL DELIMTOOLS FUNCTIONALITY !!!
+```bash
+# need to be in 'delimtools-testing/software'
+wget https://bioinfo.mnhn.fr/abi/public/abgd/last.tgz -O abgd.tgz
+tar -xzvf abgd.tgz
+cd Abgd
+make
+mkdir bin
+mv abgd bin/abgd
+cd ..
+```
+
+
 ### Install raxml-ng
 ##### !!! REQUIRED TO GENERATE DATASET !!!
 ```bash
