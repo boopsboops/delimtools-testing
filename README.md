@@ -129,7 +129,11 @@ abgd.df |> report_delim()
 #delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
 #source(here("../delimtools/R/mptp.R"))
 #mptp.s.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
-mptp.s.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
+# get min branch lengths
+#source(here::here("../delimtools/R/mptp.R"))
+#source(here::here("../delimtools/R/minbr.R"))
+min_brlen(tree = here::here("assets/coi.geophagus.haps.raxml.nwk"))
+mptp.s.df <- mptp(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
 #mptp.df |> print(n=Inf)
 mptp.s.df |> report_delim()
 
