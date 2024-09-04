@@ -17,6 +17,7 @@ For code to acquire the _Geophagus_ dataset please follow instructions in [acqui
 #renv::install(here::here("../delimtools"))
 #renv::install("legalLab/delimtools")
 # load R packages
+# rm(list=ls())
 source(here::here("scripts/load-libs.R"))
 
 
@@ -130,8 +131,8 @@ abgd.df |> report_delim()
 #source(here("../delimtools/R/mptp.R"))
 #mptp.s.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
 # get min branch lengths
-#source(here::here("../delimtools/R/mptp.R"))
-#source(here::here("../delimtools/R/minbr.R"))
+source(here::here("../delimtools/R/mptp.R"))
+source(here::here("../delimtools/R/min_brlen.R"))
 min_brlen(tree = here::here("assets/coi.geophagus.haps.raxml.nwk"))
 mptp.s.df <- mptp(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
 #mptp.df |> print(n=Inf)
@@ -144,7 +145,9 @@ mptp.s.df |> report_delim()
 
 #minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
 #delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-mptp.m.df <- delimtools::mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi")
+source(here::here("../delimtools/R/mptp.R"))
+source(here::here("../delimtools/R/min_brlen.R"))
+mptp.m.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi",minbrlen=0.001735)
 #mptp.df |> print(n=Inf)
 mptp.m.df |> report_delim()
 
@@ -194,11 +197,11 @@ n.spp <- all.delims.df.sub |>
     length()
 
 # randomise colours
-set.seed(42)
+set.seed(4242)
 cols2 <- randomcoloR::distinctColorPalette(k=n.spp)
 
 # plot and save
 source(here("../delimtools/R/delim_autoplot.R"))
-p <- delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols2,hexpand=0.4,widths=c(0.5,0.2),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"))
-ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=400,width=300,units="mm")
+p <- delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols2,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"),consensus=TRUE)
+ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=500,width=400,units="mm")
 ```
