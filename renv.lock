@@ -24,7 +24,7 @@
       },
       {
         "Name": "CRAN",
-        "URL": "https://cloud.r-project.org/"
+        "URL": "https://cloud.r-project.org"
       }
     ]
   },
@@ -490,10 +490,14 @@
     },
     "delimtools": {
       "Package": "delimtools",
-      "Version": "1.0.0",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "software/delimtools.zip",
+      "Version": "0.1.0",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "legalLab",
+      "RemoteRepo": "delimtools",
+      "RemoteRef": "main",
+      "RemoteSha": "39f300c12d1fc0005ea27aaa5901e6ceec338a6e",
       "Requirements": [
         "RColorBrewer",
         "ape",
@@ -517,7 +521,7 @@
         "tidyselect",
         "vctrs"
       ],
-      "Hash": "c3c47e571bedfc64b35e0ed30d525a22"
+      "Hash": "656c36b1f67cda5c528e9f863da682d3"
     },
     "desc": {
       "Package": "desc",

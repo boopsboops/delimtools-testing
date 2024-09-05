@@ -50,7 +50,7 @@ coi.geophagus.haps.fa <- ape::read.FASTA(here::here("assets/coi.geophagus.haps.f
 morph.df <- delimtools::morph_tbl(labels=dplyr::pull(coi.geophagus.haps.df,gbAccession),sppVector=dplyr::pull(coi.geophagus.haps.df,scientificName))
 morph.df
 #morph.df |> print(n=Inf)
-morph.df |> report_delim()
+morph.df |> delimtools::report_delim()
 
 
 ##################
@@ -65,7 +65,7 @@ summary(gmyc.res)
 # make df
 gmyc.df <- delimtools::gmyc_tbl(gmyc.res)
 #gmyc.df |> print(n=Inf)
-gmyc.df |> report_delim()
+gmyc.df |> delimtools::report_delim()
 
 
 ##################
@@ -77,7 +77,7 @@ bgmyc.res.single <- bGMYC::bgmyc.singlephy(treeio::as.phylo(coi.geophagus.haps.b
 # make df
 bgmyc.df <- delimtools::bgmyc_tbl(bgmyc.res.single,ppcutoff=0.05)
 #bgmyc.df |> print(n=Inf)
-bgmyc.df |> report_delim()
+bgmyc.df |> delimtools::report_delim()
 
 
 ##################
@@ -89,7 +89,7 @@ lmin <- spider::localMinima(as.matrix(mat))
 plot(lmin); abline(v=lmin$localMinima[1],col="red")
 locmin.df <- delimtools::locmin_tbl(mat,threshold=lmin$localMinima[1])
 #locmin.df |> print(n=Inf)
-locmin.df |> report_delim()
+locmin.df |> delimtools::report_delim()
 
 
 ##################
@@ -98,7 +98,7 @@ locmin.df |> report_delim()
 
 locmin.df.pc <- delimtools::locmin_tbl(mat,threshold=0.02) |> dplyr::rename(percent=locmin)
 #locmin.df.pc |> print(n=Inf)
-locmin.df.pc |> report_delim()
+locmin.df.pc |> delimtools::report_delim()
 
 
 ##################
@@ -107,9 +107,9 @@ locmin.df.pc |> report_delim()
 
 #source(here("../delimtools/R/asap.R"))
 #asap.df <- asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
-asap.df <- delimtools::asap(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
+asap.df <- delimtools::asap_tbl(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
 #asap.df |> print(n=Inf)
-asap.df |> report_delim()
+asap.df |> delimtools::report_delim()
 
 
 ##################
@@ -117,9 +117,9 @@ asap.df |> report_delim()
 ##################
 
 #source(here("../delimtools/R/abgd.R"))
-abgd.df <- delimtools::abgd(infile=here::here("assets/coi.geophagus.haps.fasta"),slope=0.5,exe=here::here("software/Abgd/bin/abgd"),model=3)
+abgd.df <- delimtools::abgd_tbl(infile=here::here("assets/coi.geophagus.haps.fasta"),slope=0.5,exe=here::here("software/Abgd/bin/abgd"),model=3)
 #asap.df |> print(n=Inf)
-abgd.df |> report_delim()
+abgd.df |> delimtools::report_delim()
 
 
 ##################
@@ -131,12 +131,12 @@ abgd.df |> report_delim()
 #source(here("../delimtools/R/mptp.R"))
 #mptp.s.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
 # get min branch lengths
-source(here::here("../delimtools/R/mptp.R"))
-source(here::here("../delimtools/R/min_brlen.R"))
-min_brlen(tree = here::here("assets/coi.geophagus.haps.raxml.nwk"))
-mptp.s.df <- mptp(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
+#source(here::here("../delimtools/R/mptp.R"))
+#source(here::here("../delimtools/R/min_brlen.R"))
+delimtools::min_brlen(tree=here::here("assets/coi.geophagus.haps.raxml.nwk"))
+mptp.s.df <- delimtools::mptp_tbl(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
 #mptp.df |> print(n=Inf)
-mptp.s.df |> report_delim()
+mptp.s.df |> delimtools::report_delim()
 
 
 ##################
@@ -145,11 +145,11 @@ mptp.s.df |> report_delim()
 
 #minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
 #delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-source(here::here("../delimtools/R/mptp.R"))
-source(here::here("../delimtools/R/min_brlen.R"))
-mptp.m.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi",minbrlen=0.001735)
+#source(here::here("../delimtools/R/mptp.R"))
+#source(here::here("../delimtools/R/min_brlen.R"))
+mptp.m.df <- delimtools::mptp_tbl(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi",minbrlen=0.001735)
 #mptp.df |> print(n=Inf)
-mptp.m.df |> report_delim()
+mptp.m.df |> delimtools::report_delim()
 
 
 ##################
@@ -158,6 +158,7 @@ mptp.m.df |> report_delim()
 
 all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.s.df,mptp.m.df,abgd.df,morph.df))
 #all.delims.df |> print(n=Inf)
+all.delims.df |> delimtools::report_delim()
 
 
 ##################
@@ -197,11 +198,11 @@ n.spp <- all.delims.df.sub |>
     length()
 
 # randomise colours
-set.seed(4242)
+set.seed(42)
 cols2 <- randomcoloR::distinctColorPalette(k=n.spp)
 
 # plot and save
-source(here("../delimtools/R/delim_autoplot.R"))
-p <- delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols2,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"),consensus=TRUE)
+#source(here("../delimtools/R/delim_autoplot.R"))
+p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols2,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"),consensus=TRUE)
 ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=500,width=400,units="mm")
 ```

@@ -11,7 +11,7 @@ cd delimtools-testing
 mkdir temp software
 cp assets/splits_1.0-20.tar.gz software/splits_1.0-20.tar.gz
 cp assets/bGMYC_1.0.3.tar.gz software/bGMYC_1.0.3.tar.gz
-cp assets/delimtools.zip software/delimtools.zip
+#cp assets/delimtools.zip software/delimtools.zip
 ```
 
 ### Install R packages to run delimtools-testing
