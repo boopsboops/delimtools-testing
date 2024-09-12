@@ -1,0 +1,193 @@
+% Use only LaTeX2e, calling the article.cls class and 12-point type.
+\documentclass[12pt]{article}
+%\usepackage{times}
+\usepackage{booktabs}
+\usepackage{lineno}% linenumbering
+%\usepackage[onehalfspacing]{setspace} % onehalf spacing
+\usepackage{graphicx}% add graphics
+\usepackage[utf8]{inputenc}% encoding
+\usepackage{gensymb}% symbols
+\usepackage{textcomp}% symbols
+\usepackage[document]{ragged2e}% left justify
+\setlength{\RaggedRightParindent}{\parindent}%indent
+\usepackage[labelsep=period,labelfont=bf,singlelinecheck=false,figurename=Fig.]{caption}% caption format
+
+% Hyperlinking
+\usepackage{url}% for better urls
+\renewcommand{\UrlFont}{\small\ttfamily}% make urls smaller
+\PassOptionsToPackage{hyphens,spaces,obeyspaces}{url}\usepackage{hyperref}% to avoid clashes between url and hyperref
+\hypersetup{breaklinks=true,bookmarks=true,colorlinks=true,urlcolor=black,linkcolor=black,citecolor=black,pdfauthor={Rupert A.\ Collins},pdftitle={delimtools: an R package to simplify species delimitation analyses}}
+\renewcommand*{\figureautorefname}{Fig.}
+
+% Bibliography customisation 
+\usepackage[apaciteclassic]{apacite}%,nodoi
+\usepackage{natbib}
+\bibliographystyle{apacite}
+
+
+% The following parameters seem to provide a reasonable page setup.
+\topmargin 0.0cm
+\oddsidemargin 0.2cm
+\textwidth 16cm 
+\textheight 21cm
+\footskip 1.0cm
+
+% new cprime commands
+%\newcommand*{\mins}{$^{\prime}$}
+%\newcommand*{\secs}{$^{\prime\prime}$}
+
+%The next command sets up an environment for the abstract to your paper.
+\newenvironment{sciabstract}{%
+\begin{quote} \bf}
+{\end{quote}}
+
+% Include your paper's title here
+\title{\textsl{delimtools}:\ an R package to combine and simplify single-locus species-discovery analyses} 
+
+\author
+{Pedro Senna Bittencourt$^{1\ast}$, Tomas Hrbek$^{1}$, Rupert A.\ Collins$^{2}$\\ \\
+\\
+\small{$^{1}$Laboratório de Evolução e Genética Animal, Departamento de Biologia,}\\
+\small{Universidade Federal do Amazonas, Manaus, AM, Brazil}\\
+\small{$^{2}$Department of Life Sciences, Natural History Museum,}\\
+\small{Cromwell Road, London SW5 7BD, UK}\\
+\\
+\normalsize{$^\ast$To whom correspondence should be addressed; E-mail:\ pedro\_bittencourt@yahoo.com.br.}
+}
+% Include the date command, but leave its argument blank.
+\date{}
+
+%%%%%%%%%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% END OF PREAMBLE %%%%%%%%%%%%%%%%
+
+\begin{document} 
+
+% Double-space the manuscript.
+\baselineskip24pt
+
+% Make the title.
+\maketitle 
+\newpage
+\linenumbers
+% Place your abstract within the special {sciabstract} environment.
+\begin{sciabstract}
+\section*{Abstract}
+Summary of delimtools.%
+
+\bigskip
+Keywords: species discovery, taxonomy, DNA barcoding.
+\end{sciabstract}
+
+\newpage
+\section*{Introduction}
+
+Explain species delimitation and taxonomy.%
+
+Sumarise currently available tools.%
+
+Describe the need for delimtools.%
+
+Aims of the paper.%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Materials \& methods}
+
+\subsection*{Software description}
+
+How does \textsl{delimtools} work.%
+
+\subsection*{Example}
+
+Example of species delimitation using \emph{Geophagus} data from \citet{Ximenes2021}.%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Results}
+
+\subsection*{\emph{Geophagus} delimitation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section*{Discussion}
+
+Summary of work
+
+\subsection*{Acknowledgements}
+
+We thank xxx.%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{delimtools}
+
+\newpage
+\subsection*{Tables \& Figures}
+
+\begin{table}[htbp]
+\scriptsize
+\caption{fig legend}
+\begin{tabular}{ll}
+\toprule
+Delimitation & No.\ spp.\\
+\midrule
+A & 1 \\
+B & 2 \\
+C & 3 \\
+\bottomrule
+\end{tabular}
+\label{tab:xxx}
+\end{table}
+
+
+\newpage
+
+%\noindent \textbf{Figure 1}. 
+\begin{figure}[!htbp]
+\caption{fig legend.}
+\begin{center}
+%\includegraphics[width=0.7\textwidth]{file.tif}
+\end{center}
+\label{fig:xxx}
+\end{figure}
+
+
+
+\newpage
+\section*{Supplementary materials}
+
+\noindent \textbf{Table S1}. Legend.%
+\bigskip
+
+\noindent \textbf{Fig.\ S1}. Legend.%
+\bigskip
+
+\newpage 
+
+\clearpage
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
