@@ -1,17 +1,22 @@
 #!/usr/bin/env Rscript
 
-library("here")
-library("glue")
-library("cli")
-library("tidyverse")
-library("ape")
-library("spider")
-library("splits")
-library("bGMYC")
-library("treeio")
-library("ggtree")
-library("randomcoloR")
-library("delimtools")
+# quiet messages
+invisible(suppressMessages(suppressWarnings({
+    library("here")
+    library("glue")
+    library("cli")
+    library("knitr")
+    library("tidyverse")
+    library("ape")
+    library("spider")
+    library("splits")
+    library("bGMYC")
+    library("treeio")
+    library("ggtree")
+    library("randomcoloR")
+    library("haplotypes")
+    library("delimtools")
+})))
 
 pkk <- sessionInfo()
 print(pkk)
@@ -24,4 +29,6 @@ print(pkk)
 #}
 
  # report
-cli::cli_alert_success("{length(pkk$otherPkgs)} R packages loaded ...")
+writeLines("\n")
+cli::cli_alert_success("{length(pkk$otherPkgs)} R packages loaded.")
+writeLines("\n")
