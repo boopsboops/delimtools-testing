@@ -176,6 +176,9 @@ abgd.df |> delimtools::report_delim(tabulate=FALSE)
 ### run mptp ###
 ################
 
+# mPTP (Multi-Rate Poisson Tree Processes)
+# Kapli et al. (2017); https://doi.org/10.1093/bioinformatics/btx025
+
 # requires path to mPTP executable on your system
 file.exists(here::here("software/mptp/bin/mptp")) # should be TRUE
 
