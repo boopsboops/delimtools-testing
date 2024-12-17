@@ -13,11 +13,7 @@ For code to acquire the _Geophagus_ dataset please follow instructions in [acqui
 #### packages ####
 ##################
 
-#renv::install(here::here("assets/delimtools.zip"))
-#renv::install(here::here("../delimtools"))
-#renv::install("legalLab/delimtools")
 # load R packages
-# rm(list=ls())
 source(here::here("scripts/load-libs.R"))
 
 
@@ -35,6 +31,7 @@ if(!dir.exists(today.path)) {dir.create(today.path,recursive=TRUE)}
 ### load data ####
 ##################
 
+# load tree and fasta files
 coi.geophagus.haps.raxml.tr <- ape::read.tree(here::here("assets/coi.geophagus.haps.raxml.nwk"))
 coi.geophagus.haps.beast.tr <- treeio::read.beast(here::here("assets/coi.geophagus.haps.beast.tre"))
 coi.geophagus.haps.df <- readr::read_csv(here::here("assets/coi.geophagus.haps.csv"),show_col_types=FALSE)
@@ -45,131 +42,179 @@ coi.geophagus.haps.fa <- ape::read.FASTA(here::here("assets/coi.geophagus.haps.f
 #### run morph ###
 ##################
 
-# get delimitations from taxon labels in table
-# source(here("../delimtools/R/morph_tbl.R"))
-morph.df <- delimtools::morph_tbl(labels=dplyr::pull(coi.geophagus.haps.df,gbAccession),sppVector=dplyr::pull(coi.geophagus.haps.df,scientificName))
-morph.df
-#morph.df |> print(n=Inf)
-morph.df |> delimtools::report_delim()
+# `morph_tbl()` summarises any two vectors of individual labels and species delimitations
+# here we use the species names as reported on NCBI
+ncbi.df <- delimtools::morph_tbl(labels=dplyr::pull(coi.geophagus.haps.df,gbAccession),sppVector=dplyr::pull(coi.geophagus.haps.df,scientificName),delimname="ncbi")
+
+# print the delimitation table 
+ncbi.df |> delimtools::report_delim(tabulate=FALSE)
+ncbi.df |> delimtools::report_delim(tabulate=TRUE)
 
 
 ##################
 #### run gmyc ####
 ##################
 
-# https://species.h-its.org/gmyc/
+# General Mixed Yule Coalescent model
+# Monaghan et al. (2009); https://doi.org/10.1093/sysbio/syp027
+# implemented in the `splits` package
+
+# convert tree to phylo object
+coi.geophagus.haps.beast.tr.phy <- treeio::as.phylo(coi.geophagus.haps.beast.tr)
+
 # check if tree is binary (should be TRUE)
-ape::is.binary(treeio::as.phylo(coi.geophagus.haps.beast.tr))
+ape::is.binary(coi.geophagus.haps.beast.tr.phy)
+
+# run gmyc
 set.seed(42)
-gmyc.res <- splits::gmyc(treeio::as.phylo(coi.geophagus.haps.beast.tr),method="single",interval=c(0,5),quiet=FALSE)
+gmyc.res <- splits::gmyc(coi.geophagus.haps.beast.tr.phy,method="single",interval=c(0,5),quiet=FALSE)
 summary(gmyc.res)
+
 # make df
 gmyc.df <- delimtools::gmyc_tbl(gmyc.res)
-#gmyc.df |> print(n=Inf)
-gmyc.df |> delimtools::report_delim()
-#myc.df <- gmyc.df |> rename(myc=gmyc)
+gmyc.df |> delimtools::report_delim(tabulate=FALSE)
 
-##################
+
+#################
 ### run bgmyc ###
-##################
+#################
 
+# Bayesian General Mixed Yule Coalescent model
+# Reid & Carstens (2012); https://doi.org/10.1186/1471-2148-12-196
+# implemented in the `bGMYC` package
+
+# run bgmyc
 set.seed(42)
-bgmyc.res.single <- bGMYC::bgmyc.singlephy(treeio::as.phylo(coi.geophagus.haps.beast.tr),mcmc=11000,burnin=1000,thinning=100,t1=2,t2=length(treeio::as.phylo(coi.geophagus.haps.beast.tr)$tip.label),start=c(1,0.5,50))
+bgmyc.res.single <- bGMYC::bgmyc.singlephy(coi.geophagus.haps.beast.tr.phy,mcmc=11000,burnin=1000,thinning=100,t1=2,t2=length(coi.geophagus.haps.beast.tr.phy$tip.label),start=c(1,0.5,50))
+
 # make df
 bgmyc.df <- delimtools::bgmyc_tbl(bgmyc.res.single,ppcutoff=0.05)
-#bgmyc.df |> print(n=Inf)
-bgmyc.df |> delimtools::report_delim()
+bgmyc.df |> delimtools::report_delim(tabulate=FALSE)
 
 
 ##################
 ### run locmin ###
 ##################
 
+# localMinima distance threshold method
+# Brown et al. (2012; https://doi.org/10.1111/j.1755-0998.2011.03108.x)
+# implemented in the `spider` package using genetic distance matrix
+
+# make distance matrix in APE
 mat <- ape::dist.dna(coi.geophagus.haps.fa,model="raw",pairwise.deletion=TRUE)
 lmin <- spider::localMinima(as.matrix(mat))
+
+# plot to check threshold is sensible
 plot(lmin); abline(v=lmin$localMinima[1],col="red")
 locmin.df <- delimtools::locmin_tbl(mat,threshold=lmin$localMinima[1])
-#locmin.df |> print(n=Inf)
-locmin.df |> delimtools::report_delim()
+locmin.df |> delimtools::report_delim(tabulate=FALSE)
+
+
+###########################
+### run locmin treedist ###
+###########################
+
+# localMinima distance threshold method
+# Brown et al. (2012; https://doi.org/10.1111/j.1755-0998.2011.03108.x)
+# implemented in the `spider` package using patristic tree distances
+
+# patristic tree distances
+tr.mat <- ape::cophenetic.phylo(coi.geophagus.haps.raxml.tr) |> as.dist()
+tr.lmin <- spider::localMinima(tr.mat)
+
+# plot to check threshold is sensible
+plot(tr.lmin); abline(v=tr.lmin$localMinima[1],col="red")
+treedist.df <- delimtools::locmin_tbl(tr.mat,threshold=tr.lmin$localMinima[1],delimname="treedist")
+treedist.df |> delimtools::report_delim(tabulate=FALSE)
 
 
 ##################
 ##### run 2% #####
 ##################
 
-locmin.df.pc <- delimtools::locmin_tbl(mat,threshold=0.02) |> dplyr::rename(percent=locmin)
-#locmin.df.pc |> print(n=Inf)
-locmin.df.pc |> delimtools::report_delim()
+# standard DNA barcoding distance threshold cutoff of 2%
+# e.g. Ward (2009); https://doi.org/10.1111/j.1755-0998.2009.02541.x
+# can be changed to any value
+
+percent.df <- delimtools::locmin_tbl(mat,threshold=0.02,delimname="percent")
+percent.df |> delimtools::report_delim(tabulate=FALSE)
 
 
 ##################
 #### run asap ####
 ##################
 
-#source(here("../delimtools/R/asap_tbl.R"))
-#asap_tbl(webserver=here::here("temp/Results_2024-09-14/coi.geophagus.haps.fasta.Partition1.csv"))
+# ASAP (Assemble Species by Automatic Partitioning_
+# Puillandre et al. (2021); https://doi.org/10.1111/1755-0998.13281
+
+# requires path to ASAP executable on your system
+file.exists(here::here("software/ASAP/bin/asap"))# should be TRUE
 asap.df <- delimtools::asap_tbl(infile=here::here("assets/coi.geophagus.haps.fasta"),exe=here::here("software/ASAP/bin/asap"),model=3)
-#asap.df |> print(n=Inf)
-asap.df |> delimtools::report_delim()
+
+# or requires path to results produced by the ASAP webserver @ https://bioinfo.mnhn.fr/abi/public/asap/asapweb.html
+asap.df <- delimtools::asap_tbl(webserver=here::here("assets/asap.Partition_1.csv"))
+asap.df |> delimtools::report_delim(tabulate=FALSE)
 
 
 ##################
 #### run abgd ####
 ##################
 
-#source(here("../delimtools/R/abgd_tbl.R"))
-#abgd_tbl(webserver=here::here("temp/Results_2024-09-14/abgd.txt"))
-#abgd_tbl(infile=here::here("assets/coi.geophagus.haps.fasta"),slope=0.5,exe=here::here("software/Abgd/bin/abgd"),model=3)
+# ABGD (Automatic Barcode Gap Discovery)
+# Puillandre et al. (2011); https://doi.org/10.1111/j.1365-294X.2011.05239.x
+
+# requires path to ABGD executable on your system
+file.exists(here::here("software/Abgd/bin/abgd")) # should be TRUE
 abgd.df <- delimtools::abgd_tbl(infile=here::here("assets/coi.geophagus.haps.fasta"),slope=0.5,exe=here::here("software/Abgd/bin/abgd"),model=3)
-#asap.df |> print(n=Inf)
-abgd.df |> delimtools::report_delim()
+
+# or requires path to results produced by the ABGD webserver @ https://bioinfo.mnhn.fr/abi/public/abgd/abgdweb.html
+abgd.df <- delimtools::abgd_tbl(webserver=here::here("assets/abgd.groupe1.txt"))
+abgd.df |> delimtools::report_delim(tabulate=FALSE)
 
 
-##################
-### run mptp s ###
-##################
+################
+### run mptp ###
+################
 
-#minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
-#delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-#source(here("../delimtools/R/mptp.R"))
-#mptp.s.df <- mptp(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single")
-# get min branch lengths
-#source(here::here("../delimtools/R/mptp_tbl2.R"))
-#mptp_tbl2(webserver=here::here("temp/Results_2024-09-14/6qota408p0uedlma3lh4v4deu4.1.txt"))
-#mptp_tbl2(webserver=here::here("temp/Results_2024-09-14/pgrqeedkm6gima9lqncibrtcj2.1.txt"))
-#source(here::here("../delimtools/R/mptp_tbl2.R"))
-#mptp_tbl2(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
+# requires path to mPTP executable on your system
+file.exists(here::here("software/mptp/bin/mptp")) # should be TRUE
 
-#source(here::here("../delimtools/R/min_brlen.R"))
-delimtools::min_brlen(tree=here::here("assets/coi.geophagus.haps.raxml.nwk"))
-mptp.s.df <- delimtools::mptp_tbl(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001735)
-#mptp.df |> print(n=Inf)
-mptp.s.df |> delimtools::report_delim()
+# estimate minimum branch lengths (minbrlen) setting
+delimtools::min_brlen(tree=here::here("assets/coi.geophagus.haps.raxml.nwk"),n=10)
+mptp.df <- delimtools::mptp_tbl(infile=here::here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="single",minbrlen=0.001)
+
+# or requires path to results produced by the mPTP webserver @ https://mptp.h-its.org/#/tree
+mptp.df <- delimtools::mptp_tbl(webserver=here::here("assets/mptp.webserver.txt"))
+mptp.df |> delimtools::report_delim(tabulate=FALSE)
 
 
-##################
-### run mptp m ###
-##################
+################
+### run pnet ###
+################
 
-#minbrlen <- format(min(coi.geophagus.raxml.tr.root$edge.length),scientific=FALSE)
-#delimtools::minbr(tree=raxml.tr.path, file=here("assets/coi.geophagus.fasta"))
-#source(here::here("../delimtools/R/mptp.R"))
-#source(here::here("../delimtools/R/min_brlen.R"))
-mptp.m.df <- delimtools::mptp_tbl(infile=here("assets/coi.geophagus.haps.raxml.nwk"),exe=here::here("software/mptp/bin/mptp"),method="multi",minbrlen=0.001735)
-#mptp.df |> print(n=Inf)
-mptp.m.df |> delimtools::report_delim()
+# statistical parsimony network
+# Templeton et al. (1992); https://doi.org/10.1093/genetics/132.2.619
+# implemented in `haplotypes` package
+
+pnet <- haplotypes::parsimnet(haplotypes::as.dna(as.matrix(coi.geophagus.haps.fa)),indels="sic",prob=0.95)
+pnet.df <- delimtools:::parsimnet_tbl(dna=coi.geophagus.haps.fa, parsimnet=pnet)
+pnet.df |> delimtools::report_delim(tabulate=FALSE)
 
 
 ##################
 ### join delims ##
 ##################
 
-all.delims.df <- delimtools::delim_join(list(gmyc.df,bgmyc.df,locmin.df,locmin.df.pc,asap.df,mptp.s.df,mptp.m.df,abgd.df,morph.df))
-#all.delims.df <- delimtools::delim_join(list(gmyc.df,myc.df))
-#all.delims.df |> print(n=Inf)
-all.delims.df |> delimtools::report_delim()
+# combine all delimitation methods into one table
+all.delims.df <- delimtools::delim_join(list(ncbi.df,pnet.df,mptp.df,gmyc.df,bgmyc.df,locmin.df,treedist.df,percent.df,asap.df,abgd.df))
+all.delims.df |> delimtools::report_delim(tabulate=FALSE)
+all.delims.df |> delimtools::report_delim(tabulate=TRUE)
 
-all.delims.df |> delim_consensus(n_match=6)
+# make consensus 
+all.delims.df |> delim_consensus(n_match=5) |> delimtools::report_delim(tabulate=TRUE)
+
+# match ratio congruence
+all.delims.df |> delimtools::match_ratio() |> dplyr::arrange(desc(match_ratio)) |> knitr::kable() |> print()
 
 
 ##################
@@ -200,19 +245,16 @@ tip.tab <- coi.geophagus.haps.df.sub |>
     dplyr::mutate(labs=glue::glue("{gbAccession} | {scientificName}")) |> 
     dplyr::select(gbAccession,labs,scientificName)
 
-
 # get cols
-source(here("../delimtools/R/delim_brewer.R"))
-#cols <- delim_brewer(delim=all.delims.df.sub, package="viridisLite", palette="viridis", seed=42)
-#cols <- delim_brewer(delim=all.delims.df.sub, package="viridisLite", palette="plasma", seed=42)
-#cols <- delim_brewer(delim=all.delims.df.sub, package="RColorBrewer", palette="Set1", seed=42)
-#cols <- delim_brewer(delim=all.delims.df.sub, package="RColorBrewer", palette="Paired", seed=42)
-#cols <- delim_brewer(delim=all.delims.df.sub, package="randomcoloR", seed=42)
+cols <- delimtools::delim_brewer(delim=all.delims.df,package="viridisLite",palette="viridis",seed=42)
+cols <- delimtools::delim_brewer(delim=all.delims.df,package="viridisLite",palette="plasma",seed=42)
+cols <- delimtools::delim_brewer(delim=all.delims.df,package="RColorBrewer",palette="Set2",seed=42)
+cols <- delimtools::delim_brewer(delim=all.delims.df,package="randomcoloR",seed=42)
 cols <- delimtools::delim_brewer(delim=all.delims.df.sub)
 
 # plot and save
 #source(here("../delimtools/R/delim_autoplot.R"))
-p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","ptp","mptp","morph"),consensus=TRUE)
+p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","mptp","ncbi","parsimnet"),consensus=TRUE)
 ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=500,width=400,units="mm")
 
 
