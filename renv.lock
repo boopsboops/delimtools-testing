@@ -387,16 +387,6 @@
       ],
       "Hash": "af436915c590afc6fffc3ce3a5be1569"
     },
-    "codetools": {
-      "Package": "codetools",
-      "Version": "0.2-20",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "61e097f35917d342622f21cdc79c256e"
-    },
     "colorspace": {
       "Package": "colorspace",
       "Version": "2.1-1",
@@ -511,48 +501,23 @@
     },
     "delimtools": {
       "Package": "delimtools",
-      "Version": "0.1.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "legalLab",
-      "RemoteRepo": "delimtools",
-      "RemoteRef": "main",
-      "RemoteSha": "bbb47760a098aaa09e9ae063d99e4ca4e7311077",
+      "Version": "0.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
       "Requirements": [
-        "RColorBrewer",
-        "ape",
-        "bGMYC",
+        "R",
         "cli",
         "dplyr",
-        "forcats",
-        "furrr",
-        "ggfun",
-        "ggplot2",
         "ggtree",
         "glue",
-        "gtools",
-        "here",
-        "knitr",
-        "magrittr",
         "methods",
-        "patchwork",
         "purrr",
-        "randomcoloR",
-        "readr",
         "rlang",
-        "scales",
-        "spider",
-        "splits",
         "stringr",
-        "tibble",
         "tidyr",
-        "tidyselect",
-        "tidytree",
-        "vctrs",
-        "withr"
+        "tidyselect"
       ],
-      "Hash": "d243329130c5c744e1bd7bcc63e40aa5"
+      "Hash": "c31159d3349bf7af5c293ecc3a0a1b0c"
     },
     "desc": {
       "Package": "desc",
@@ -704,37 +669,6 @@
         "methods"
       ],
       "Hash": "7f48af39fa27711ea5fbd183b399920d"
-    },
-    "furrr": {
-      "Package": "furrr",
-      "Version": "0.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "future",
-        "globals",
-        "lifecycle",
-        "purrr",
-        "rlang",
-        "vctrs"
-      ],
-      "Hash": "da7a4c32196cb2262a41dd5a25d486ff"
-    },
-    "future": {
-      "Package": "future",
-      "Version": "1.34.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "digest",
-        "globals",
-        "listenv",
-        "parallel",
-        "parallelly",
-        "utils"
-      ],
-      "Hash": "475771e3edb711591476be387c9a8c2e"
     },
     "gargle": {
       "Package": "gargle",
@@ -898,17 +832,6 @@
       ],
       "Hash": "ab08ac61f3e1be454ae21911eb8bc2fe"
     },
-    "globals": {
-      "Package": "globals",
-      "Version": "0.16.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "codetools"
-      ],
-      "Hash": "2580567908cafd4f187c1e5a91e98b7f"
-    },
     "glue": {
       "Package": "glue",
       "Version": "1.8.0",
@@ -1000,18 +923,6 @@
         "stats"
       ],
       "Hash": "de949855009e2d4d0e52a844e30617ae"
-    },
-    "gtools": {
-      "Package": "gtools",
-      "Version": "3.9.5",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "methods",
-        "stats",
-        "utils"
-      ],
-      "Hash": "588d091c35389f1f4a9d533c8d709b35"
     },
     "haplotypes": {
       "Package": "haplotypes",
@@ -1275,16 +1186,6 @@
       ],
       "Hash": "b8552d117e1b808b09a832f589b79035"
     },
-    "listenv": {
-      "Package": "listenv",
-      "Version": "0.9.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R"
-      ],
-      "Hash": "e2fca3e12e4db979dccc6e519b10a7ee"
-    },
     "lubridate": {
       "Package": "lubridate",
       "Version": "1.9.4",
@@ -1413,18 +1314,6 @@
         "askpass"
       ],
       "Hash": "5bfe2927efa9f87766ca9605301ea48f"
-    },
-    "parallelly": {
-      "Package": "parallelly",
-      "Version": "1.40.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "parallel",
-        "tools",
-        "utils"
-      ],
-      "Hash": "9951cf3fcae168ebd0349ce4251508bd"
     },
     "paran": {
       "Package": "paran",

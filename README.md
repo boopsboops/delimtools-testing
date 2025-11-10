@@ -47,8 +47,7 @@ coi.geophagus.haps.fa <- ape::read.FASTA(here::here("assets/coi.geophagus.haps.f
 ncbi.df <- delimtools::morph_tbl(labels=dplyr::pull(coi.geophagus.haps.df,gbAccession),sppVector=dplyr::pull(coi.geophagus.haps.df,scientificName),delimname="ncbi")
 
 # print the delimitation table 
-ncbi.df |> delimtools::report_delim(tabulate=FALSE)
-ncbi.df |> delimtools::report_delim(tabulate=TRUE)
+ncbi.df |> delimtools::report_delim()
 
 
 ##################
@@ -72,7 +71,7 @@ summary(gmyc.res)
 
 # make df
 gmyc.df <- delimtools::gmyc_tbl(gmyc.res)
-gmyc.df |> delimtools::report_delim(tabulate=FALSE)
+gmyc.df |> delimtools::report_delim()
 
 
 #################
@@ -89,7 +88,7 @@ bgmyc.res.single <- bGMYC::bgmyc.singlephy(coi.geophagus.haps.beast.tr.phy,mcmc=
 
 # make df
 bgmyc.df <- delimtools::bgmyc_tbl(bgmyc.res.single,ppcutoff=0.05)
-bgmyc.df |> delimtools::report_delim(tabulate=FALSE)
+bgmyc.df |> delimtools::report_delim()
 
 
 ##################
@@ -107,7 +106,7 @@ lmin <- spider::localMinima(as.matrix(mat))
 # plot to check threshold is sensible
 plot(lmin); abline(v=lmin$localMinima[1],col="red")
 locmin.df <- delimtools::locmin_tbl(mat,threshold=lmin$localMinima[1])
-locmin.df |> delimtools::report_delim(tabulate=FALSE)
+locmin.df |> delimtools::report_delim()
 
 
 ###########################
@@ -125,7 +124,7 @@ tr.lmin <- spider::localMinima(tr.mat)
 # plot to check threshold is sensible
 plot(tr.lmin); abline(v=tr.lmin$localMinima[1],col="red")
 treedist.df <- delimtools::locmin_tbl(tr.mat,threshold=tr.lmin$localMinima[1],delimname="treedist")
-treedist.df |> delimtools::report_delim(tabulate=FALSE)
+treedist.df |> delimtools::report_delim()
 
 
 ##################
@@ -137,7 +136,7 @@ treedist.df |> delimtools::report_delim(tabulate=FALSE)
 # can be changed to any value
 
 percent.df <- delimtools::locmin_tbl(mat,threshold=0.02,delimname="percent")
-percent.df |> delimtools::report_delim(tabulate=FALSE)
+percent.df |> delimtools::report_delim()
 
 
 ##################
@@ -153,7 +152,7 @@ asap.df <- delimtools::asap_tbl(infile=here::here("assets/coi.geophagus.haps.fas
 
 # or requires path to results produced by the ASAP webserver @ https://bioinfo.mnhn.fr/abi/public/asap/asapweb.html
 asap.df <- delimtools::asap_tbl(webserver=here::here("assets/asap.Partition_1.csv"))
-asap.df |> delimtools::report_delim(tabulate=FALSE)
+asap.df |> delimtools::report_delim()
 
 
 ##################
@@ -169,7 +168,7 @@ abgd.df <- delimtools::abgd_tbl(infile=here::here("assets/coi.geophagus.haps.fas
 
 # or requires path to results produced by the ABGD webserver @ https://bioinfo.mnhn.fr/abi/public/abgd/abgdweb.html
 abgd.df <- delimtools::abgd_tbl(webserver=here::here("assets/abgd.groupe1.txt"))
-abgd.df |> delimtools::report_delim(tabulate=FALSE)
+abgd.df |> delimtools::report_delim()
 
 
 ################
@@ -188,7 +187,7 @@ mptp.df <- delimtools::mptp_tbl(infile=here::here("assets/coi.geophagus.haps.rax
 
 # or requires path to results produced by the mPTP webserver @ https://mptp.h-its.org/#/tree
 mptp.df <- delimtools::mptp_tbl(webserver=here::here("assets/mptp.webserver.txt"))
-mptp.df |> delimtools::report_delim(tabulate=FALSE)
+mptp.df |> delimtools::report_delim()
 
 
 ################
@@ -201,7 +200,7 @@ mptp.df |> delimtools::report_delim(tabulate=FALSE)
 
 pnet <- haplotypes::parsimnet(haplotypes::as.dna(as.matrix(coi.geophagus.haps.fa)),indels="sic",prob=0.95)
 pnet.df <- delimtools:::parsimnet_tbl(dna=coi.geophagus.haps.fa, parsimnet=pnet)
-pnet.df |> delimtools::report_delim(tabulate=FALSE)
+pnet.df |> delimtools::report_delim()
 
 
 ##################
@@ -210,11 +209,10 @@ pnet.df |> delimtools::report_delim(tabulate=FALSE)
 
 # combine all delimitation methods into one table
 all.delims.df <- delimtools::delim_join(list(ncbi.df,pnet.df,mptp.df,gmyc.df,bgmyc.df,locmin.df,treedist.df,percent.df,asap.df,abgd.df))
-all.delims.df |> delimtools::report_delim(tabulate=FALSE)
-all.delims.df |> delimtools::report_delim(tabulate=TRUE)
+all.delims.df |> delimtools::report_delim()
 
 # make consensus 
-all.delims.df |> delim_consensus(n_match=5) |> delimtools::report_delim(tabulate=TRUE)
+all.delims.df |> delim_consensus(n_match=5) |> delimtools::report_delim()
 
 # match ratio congruence
 all.delims.df |> delimtools::match_ratio() |> dplyr::arrange(desc(match_ratio)) |> knitr::kable() |> print()
@@ -225,18 +223,10 @@ all.delims.df |> delimtools::match_ratio() |> dplyr::arrange(desc(match_ratio)) 
 ##################
 
 # clean and subsample
-set.seed(42)
-coi.geophagus.haps.df.sub <- coi.geophagus.haps.df |> 
+#set.seed(42)
+coi.geophagus.haps.df <- coi.geophagus.haps.df |> 
     mutate(scientificName=str_replace_all(scientificName,"_AMX-2021","")) |> 
-    mutate(scientificName=str_replace_all(scientificName,"_"," ")) |> 
-    slice_sample(n=8,by=scientificName)
-
-# subsample the delims
-all.delims.df.sub <- all.delims.df |> filter(labels %in% pull(coi.geophagus.haps.df.sub,gbAccession))
-
-# subample tips
-#source(here("../delimtools/R/delim_autoplot2.R"))
-coi.geophagus.haps.beast.tr.sub <- coi.geophagus.haps.beast.tr |> tidytree::keep.tip(pull(coi.geophagus.haps.df.sub,gbAccession))
+    mutate(scientificName=str_replace_all(scientificName,"_"," "))
 
 
 ##################
@@ -244,7 +234,9 @@ coi.geophagus.haps.beast.tr.sub <- coi.geophagus.haps.beast.tr |> tidytree::keep
 ##################
 
 # make tip label table
-tip.tab <- coi.geophagus.haps.df.sub |> 
+tip.tab <- coi.geophagus.haps.df |> 
+    mutate(scientificName=stringr::str_replace_all(scientificName,"_AMX-2021","")) |> 
+    mutate(scientificName=stringr::str_replace_all(scientificName,"_"," ")) |>
     dplyr::mutate(labs=glue::glue("{gbAccession} | {scientificName}")) |> 
     dplyr::select(gbAccession,labs,scientificName)
 
@@ -253,17 +245,9 @@ cols <- delimtools::delim_brewer(delim=all.delims.df,package="viridisLite",palet
 cols <- delimtools::delim_brewer(delim=all.delims.df,package="viridisLite",palette="plasma",seed=42)
 cols <- delimtools::delim_brewer(delim=all.delims.df,package="RColorBrewer",palette="Set2",seed=42)
 cols <- delimtools::delim_brewer(delim=all.delims.df,package="randomcoloR",seed=42)
-cols <- delimtools::delim_brewer(delim=all.delims.df.sub)
 
 # plot and save
-#source(here("../delimtools/R/delim_autoplot.R"))
-p <- delimtools::delim_autoplot(delim=all.delims.df.sub,tr=coi.geophagus.haps.beast.tr.sub,tbl_labs=tip.tab,col_vec=cols,hexpand=0.3,widths=c(0.4,0.1),n_match=3,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","mptp","ncbi","parsimnet"),consensus=TRUE)
+p <- delimtools::delim_autoplot(delim=all.delims.df,tr=coi.geophagus.haps.beast.tr,tbl_labs=tip.tab,col_vec=cols,hexpand=0.3,widths=c(0.5,0.4),n_match=5,delim_order=c("asap","abgd","locmin","percent","gmyc","bgmyc","mptp","ncbi","parsimnet"),consensus=TRUE)
 ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=500,width=400,units="mm")
-
-
-# autoplot2
-p <- delimtools::delim_autoplot2(delim=all.delims.df.sub, tr=coi.geophagus.haps.beast.tr.sub, consensus=TRUE, n_match= 5, tbl_labs=tip.tab, species="scientificName",hexpand= 0.1, widths= c(0.5, 0.2))
-ggplot2::ggsave(here::here(today.path,"geophagus-delimitation.pdf"),plot=p,height=500,width=400,units="mm")
-
 
 ```
